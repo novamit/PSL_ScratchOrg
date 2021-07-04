@@ -1,0 +1,85 @@
+export SFDX_USE_GENERIC_UNIX_KEYCHAIN=true
+sh $sfdx force:auth:jwt:grant -i ${Consumer_Key_1SF} -u ${UName_1SF} -r ${Sandbox} -f ${Server_Key_file} -a VForce1SF
+sh $sfdx force:auth:logout -u VForce1SF <<< y
+sh $sfdx force:org:list
+
+//To Install CPQ in org
+sfdx force:package:install --package=04t4N000000YTOgQAO
+
+// Common DEV Hub User Credentials
+https://vistramain.my.salesforce.com/?un=devhub@vistravforce.com&pw=\/i$tr@2o2o
+
+ 
+
+// Authorize the DevHub
+sfdx force:auth:web:login -d -a VForceDevHub
+
+ 
+
+// Clone the Repository
+git clone https://github.com/Jordans-Vistra/VForce
+
+ 
+
+// Go to the Cloned Repository Folder
+cd VForce
+
+ 
+
+// Create a new brand new Scratch Org
+sfdx force:org:create -s -f config/project-scratch-def.json -a CommitTest -v VForceDevHub
+
+ 
+
+// Open Default/Scratch Org
+sfdx force:org:open
+
+ 
+
+// Install the manged Packages for NS for SFDC & ZoomInfor
+sfdx force:package:install --package=04t2K000000KXvXQAW
+sfdx force:package:install --package=04t2R0000009J07
+// will ask for confirmation, we need to reply with Y
+
+ 
+
+/************************************************************************************/
+/*  Make Sure to Swithc to the desired branch from where you want to push the code  */
+/************************************************************************************/
+
+ 
+
+// Push Changes to GitHub & Deploy the latest to Scratch Org
+sfdx force:source:push
+
+ 
+
+// Deploye All Items from the manifest's package.xml file
+sfdx force:source:deploy --checkonly --manifest .\manifest\package.xml --json --loglevel fatal
+
+ 
+
+// Deploy Sepecific Files or Folders
+sfdx force:source:deploy --sourcepath .\force-app\main\default\aura
+sfdx force:source:deploy --sourcepath .\force-app\main\default\settings\Account.settings-meta.xml
+sfdx force:source:deploy --sourcepath .\force-app\main\default\settings\AccountIntelligence.settings-meta.xml
+sfdx force:source:deploy --sourcepath .\force-app\main\default\settings\UserInterface.settings-meta.xml
+sfdx force:source:deploy --sourcepath .\force-app\main\default\settings\Name.settings-meta.xml
+sfdx force:source:deploy --sourcepath .\force-app\main\default\settings\EnhancedNotes.settings-meta.xml
+sfdx force:source:deploy --sourcepath .\force-app\main\default\settings\Currency.settings-meta.xml
+
+ 
+
+// List all connected Orgs including Scratch orgs
+sfdx force:org:list
+
+//To identify changes in scratch org
+sfdx force:source:status
+
+//To disable track in scratch org
+sfdx force:source:tracking:clear
+sfdx force:source:tracking:reset
+ 
+
+// Delete Scratch Org
+sfdx force:org:delete -u CommitTest -p
